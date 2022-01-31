@@ -51,24 +51,24 @@ cleanup () {
 }
 
 # Convert Github username to Slack username.
-convert_author_gh_slack () {
-    while IFS=':' read -ra USERNAME
-    do
-        if [[ $1 == ${USERNAME[0]} ]]; then
-            AUTHOR=${USERNAME[1]}
-            FOUND_MATCH=true
-            break
-        else
-            FOUND_MATCH=false
-        fi
-    done < SQUAD_USERNAMES
+# convert_author_gh_slack () {
+#     while IFS=':' read -ra USERNAME
+#     do
+#         if [[ $1 == ${USERNAME[0]} ]]; then
+#             AUTHOR=${USERNAME[1]}
+#             FOUND_MATCH=true
+#             break
+#         else
+#             FOUND_MATCH=false
+#         fi
+#     done < SQUAD_USERNAMES
 
-    if [[ $FOUND_MATCH == "false" ]]; then
-        ERROR="Warning: In $REPO repo, @$1 is the author of pr: $PR_NUMBER; however, the username is not mapped to any id within the SQUAD_USERNAME list."
-        printf "$ERROR\n" >> $REPORT_DIR/$REPORT_FILE_NAME.log
-        echo -e "$ERROR"
-    fi
-}
+#     if [[ $FOUND_MATCH == "false" ]]; then
+#         ERROR="Warning: In $REPO repo, @$1 is the author of pr: $PR_NUMBER; however, the username is not mapped to any id within the SQUAD_USERNAME list."
+#         printf "$ERROR\n" >> $REPORT_DIR/$REPORT_FILE_NAME.log
+#         echo -e "$ERROR"
+#     fi
+# }
 
 push_report_to_slack () {
     if [ $TOTAL_PR_COUNT -le 10 ]; then
@@ -100,33 +100,60 @@ TOTAL_PR_COUNT=0
 
 for REPO in $REPOSITORIES; do
     echo -e "\n${YELLOW}Checking $REPO for open pull request${NC}"
-    MESSAGE="\nCurrent active <https://www.github.com/$REPO/pulls|PRs> in $REPO"
+
+    git clone https://github.com/$ORG/$REPO.git
+
+    cd $REPO && pwd
+
+    # echo -e "Go Files:\n$(ls -R | grep 'go.')"
+    # echo -e "NPM Files:\n$(ls -R | grep 'package.')"
+
+    ls | grep 'go.' > GO_FILES
+    ls | grep 'package.' > NPM_FILES
+
+    # if [[ -s GO_FILES ]]; then
+    #     echo "There are golang files"
+    # else
+    #     echo -e "No Go mods detected... Checking for NPM packages."
+    # fi
+
+    if [[ -s NPM_FILES ]]; then
+        echo -e "\nChecking for outdated package dependencies within $ORG/$REPO\n" >> ../$TXT_REPORT_FILE
+        npm ci
+        npm outdated >> ../OUTDATED
+    fi
+
+
+    cd .. && rm -rf $REPO
+
+    # MESSAGE="\nCurrent active <https://www.github.com/$REPO/pulls|PRs> in $REPO"
 
     # Capture the available PR data from the targeted repository.
-    gh pr list -R $REPO > PULL_REQUEST
+    # gh pr list -R $REPO > PULL_REQUEST
 
-    if [[ ! -s PULL_REQUEST ]]; then
-        echo -e "\t• There are no open pull requests in ${PURPLE}$REPO${NC}\n"
-    else
-        echo -e "\t• Found open pull requests in ${PURPLE}$REPO${NC}\n"
-        echo -e $MESSAGE >> $TXT_REPORT_FILE
+    # if [[ ! -s PULL_REQUEST ]]; then
+    #     echo -e "\t• There are no open pull requests in ${PURPLE}$REPO${NC}\n"
+    # else
+    #     echo -e "\t• Found open pull requests in ${PURPLE}$REPO${NC}\n"
+    #     echo -e $MESSAGE >> $TXT_REPORT_FILE
 
-        while IFS= read -r PR
-        do
-            PR_NUMBER=$(echo $PR | head -n1 | awk '{print $1;}')
-            AUTHOR=$(gh pr list -R $REPO --search=${PR_NUMBER} --json=author | jq -r .[].author.login)
+    #     while IFS= read -r PR
+    #     do
+    #         PR_NUMBER=$(echo $PR | head -n1 | awk '{print $1;}')
+    #         AUTHOR=$(gh pr list -R $REPO --search=${PR_NUMBER} --json=author | jq -r .[].author.login)
 
-            convert_author_gh_slack $AUTHOR
-            echo -e "\t• <https://www.github.com/$REPO/pull/$PR_NUMBER|$PR> <@$AUTHOR>" >> $TXT_REPORT_FILE
+    #         convert_author_gh_slack $AUTHOR
+    #         echo -e "\t• <https://www.github.com/$REPO/pull/$PR_NUMBER|$PR> <@$AUTHOR>" >> $TXT_REPORT_FILE
 
-            TOTAL_PR_COUNT=$(($TOTAL_PR_COUNT + 1))
-        done < PULL_REQUEST
-    fi
+    #         TOTAL_PR_COUNT=$(($TOTAL_PR_COUNT + 1))
+    #     done < PULL_REQUEST
+    # fi
 done
 
-echo -e "Total # of prs opened: $TOTAL_PR_COUNT\n"
 
-push_report_to_slack
+# echo -e "Total # of prs opened: $TOTAL_PR_COUNT\n"
+
+# push_report_to_slack
 cleanup
 
 exit 0
