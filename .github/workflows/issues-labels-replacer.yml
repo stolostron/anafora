@@ -9,6 +9,9 @@ on:
   schedule:
     - cron: '0 8 * * 1-5' # Actions will be executed at 8am for every weekday.
 
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   main:
     runs-on: ubuntu-latest
@@ -23,7 +26,6 @@ jobs:
 
       - name: "Replace labels for Observability,Component:Search"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPLACEMENT_LABELS: "squad:observability,component:search"
           SQUAD_LABEL: "squad:observability-usa"
           TARGET_LABELS: "squad:observability-usa"
