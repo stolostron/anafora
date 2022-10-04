@@ -121,6 +121,12 @@ def write_issues_to_csv(file, issues, component)
         # Jira defines their user stories as story.
         if type == 'user_story'
             type = 'story'
+
+        elsif type == 'enhancement'
+            type = "feature"
+
+        elsif type == 'blog'
+            type = 'task'
         end
 
         items.each do |issue|
