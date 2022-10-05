@@ -54,8 +54,48 @@ def map_labels_to_jira(issue)
     else
         if issue.labels.any? {|label| label.name == "component:search"}
             labels = "Obs-Search"
+
         elsif issue.labels.any? {|label| label.name == "squad:observability"}
             labels = "Obs-Core"
+
+        elsif issue.labels.any? {|label| label.name == "squad:app-lifecycle" || label.name == "squad:app-lifecycle-ui"}
+            labels = ""
+
+        elsif issue.labels.any? {|label| label.name == "squad:cloud-services"}
+            labels = "CloudServices"
+
+        elsif issue.labels.any? {|label| label.name == "squad:cluster-lifecycle"}
+            labels = ""
+
+        elsif issue.labels.any? {|label| label.name == "squad:console"}
+            labels = "Console"
+
+        elsif issue.labels.any? {|label| label.name == "squad:doc"}
+            labels = "Doc"
+
+        elsif issue.labels.any? {|label| label.name == "squad:far-edge"}
+            labels = "FarEdge"
+
+        elsif issue.labels.any? {|label| label.name == "squad:hub-of-hubs"}
+            labels = "HubofHubs"
+
+        elsif issue.labels.any? {|label| label.name == "squad:hypershift"}
+            labels = "Hypershift"
+
+        elsif issue.labels.any? {|label| label.name == "squad:installer"}
+            labels = "Installer"
+
+        elsif issue.labels.any? {|label| label.name == "squad:integration"}
+            labels = "Integration"
+
+        elsif issue.labels.any? {|label| label.name == "squad:qe"}
+            labels = "QE"
+
+        elsif issue.labels.any? {|label| label.name == "squad:secure-engineering"}
+            labels = "secure-engineering"
+
+        elsif issue.labels.any? {|label| label.name == "squad:server-foundation"}
+            labels = ""
         end
     end
 
