@@ -11,3 +11,9 @@ gem 'colorize', '~> 0.8.1'
 
 # Use octokit to connect to the GitHub API client.
 gem 'octokit', '~> 5.6', '>= 5.6.1'
+
+# Use ruby-graphviz to provide an interfacew and layout. (brew install graphviz)
+gem 'ruby-graphviz', '~> 1.2', '>= 1.2.5'
+
+# Use faraday-retry to catch execptions and retries each request a limited number of times.
+gem 'faraday-retry', '~> 2.0'

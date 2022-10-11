@@ -8,6 +8,11 @@ BEGIN {
 
     Config.initialize
 
+    $ZENHUB_TOKEN = ENV["ZENHUB_TOKEN"]
+    unless $ZENHUB_TOKEN
+        puts "[WARNING] ZENHUB_TOKEN is not exported; (ZENHUB_TOKEN is required to extract estimate points from GitHub issues)".yellow
+    end
+
     client = Octokit::Client.new(:access_token => $GITHUB_TOKEN)
 }
 
@@ -20,7 +25,7 @@ END {
 # @return file - The csv file that was created.
 def create_csv_file_for_jira_import(filename)
     file = File.new(filename, "w")
-    file.puts("Component/s,Issue Type,Summary,Description,Labels,Assignee,Priority,Severity,Blocked,Epic Name")
+    file.puts("Component/s,Issue Type,Summary,Description,Labels,Assignee,Priority,Severity,Blocked,Epic Name,Story Point")
 
     return file
 end
@@ -41,6 +46,25 @@ def map_epic_name_to_jira(issue)
     end
 
     return issue.title
+end
+
+# Map the issue's point estimate to the Jira field.
+# @param issue - The GitHub issue.
+# @return estimate - The point estimate of the GitHub issue.
+def map_estimate_to_jira(issue)
+    estimate = ""
+
+    # To extract the estimate point from the GitHub issue, the ZENHUB_TOKEN is required.
+    if $ZENHUB_TOKEN
+        estimate=`curl -s -H "X-Authentication-Token: #{$ZENHUB_TOKEN}" "https://api.zenhub.io/p1/repositories/239633281/issues/#{issue.number}" | jq -r '. | (.estimate.value|tostring)'`.strip
+
+        # If the issue does not contain an estimate, it will be returned as null.
+        if estimate == "null"
+            estimate = ""
+        end
+    end
+
+    return estimate
 end
 
 # Map issue severity and priority to the Jira fields.
@@ -139,10 +163,14 @@ def write_issues_to_csv(file, issues, component, labels)
 
                 # Map the epic name to the Jira field.
                 epic_name = map_epic_name_to_jira(issue)
-                puts "\tEpic Name: #{epic_name}\n\n"
+                puts "\tEpic Name: #{epic_name}\n"
+
+                # Map the estimate point to the Jira field.
+                estimate = map_estimate_to_jira(issue)
+                puts "\tEstimate: #{estimate}\n\n"
 
                 formatted_issues.push(issue.number)
-                file.puts("#{component},#{type},\"#{issue.title}\",\"Migrated issue from: #{issue.html_url}\",\"#{labels}\",\"#{assignee}\",\"#{priority}\",\"#{severity}\",#{blocked},\"#{epic_name}\"")
+                file.puts("#{component},#{type},\"#{issue.title}\",\"Migrated issue from: #{issue.html_url}\",\"#{labels}\",\"#{assignee}\",\"#{priority}\",\"#{severity}\",#{blocked},\"#{epic_name}\",#{estimate}")
             else
                 puts "\t• #{issue.number} - #{issue.title}".cyan
                 puts "\tIssue: #{issue.number} has already been formatted within the CSV file\n".yellow
