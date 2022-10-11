@@ -43,65 +43,6 @@ def map_epic_name_to_jira(issue)
     return issue.title
 end
 
-# Map issue label to the Jira fields.
-# @param issue - The GitHub issue.
-# @return labels - The labels assigned to the Jira issue.
-def map_labels_to_jira(issue)
-    labels = ""
-
-    if issue.labels.none?
-        puts "\tNo labels detected.".yellow
-    else
-        if issue.labels.any? {|label| label.name == "component:search"}
-            labels = "Obs-Search"
-
-        elsif issue.labels.any? {|label| label.name == "squad:observability"}
-            labels = "Obs-Core"
-
-        elsif issue.labels.any? {|label| label.name == "squad:app-lifecycle" || label.name == "squad:app-lifecycle-ui"}
-            labels = ""
-
-        elsif issue.labels.any? {|label| label.name == "squad:cloud-services"}
-            labels = "CloudServices"
-
-        elsif issue.labels.any? {|label| label.name == "squad:cluster-lifecycle"}
-            labels = ""
-
-        elsif issue.labels.any? {|label| label.name == "squad:console"}
-            labels = "Console"
-
-        elsif issue.labels.any? {|label| label.name == "squad:doc"}
-            labels = "Doc"
-
-        elsif issue.labels.any? {|label| label.name == "squad:far-edge"}
-            labels = "FarEdge"
-
-        elsif issue.labels.any? {|label| label.name == "squad:hub-of-hubs"}
-            labels = "HubofHubs"
-
-        elsif issue.labels.any? {|label| label.name == "squad:hypershift"}
-            labels = "Hypershift"
-
-        elsif issue.labels.any? {|label| label.name == "squad:installer"}
-            labels = "Installer"
-
-        elsif issue.labels.any? {|label| label.name == "squad:integration"}
-            labels = "Integration"
-
-        elsif issue.labels.any? {|label| label.name == "squad:qe"}
-            labels = "QE"
-
-        elsif issue.labels.any? {|label| label.name == "squad:secure-engineering"}
-            labels = "secure-engineering"
-
-        elsif issue.labels.any? {|label| label.name == "squad:server-foundation"}
-            labels = ""
-        end
-    end
-
-    return labels
-end
-
 # Map issue severity and priority to the Jira fields.
 # @param issue - The GitHub issue.
 # @param type - The GitHub issue type.
@@ -136,7 +77,7 @@ def map_user_to_id(filename, user)
 
         if !data.nil?
             puts "\t[√]: User #{user} detected.".green
-            return "#{data.split(',')[1].strip} "
+            return "#{data.split(',')[1].strip}"
         end
     end
 
@@ -148,7 +89,7 @@ end
 # @param file - The file to write the data into.
 # @param issues - The GitHub issue.
 # @param component - The ACM component to assign the issues to within Jira.
-def write_issues_to_csv(file, issues, component)
+def write_issues_to_csv(file, issues, component, labels)
     types = ['blog', 'bug', 'enhancement', 'task', 'user_story', 'Epic']
     formatted_issues = []
 
@@ -190,7 +131,6 @@ def write_issues_to_csv(file, issues, component)
                 puts "\tBlocked: #{blocked}"
 
                 # Map the labels to the Jira field.
-                labels = map_labels_to_jira(issue)
                 puts "\tLabel(s): #{labels}"
 
                 # Map the severity and priority to the Jira fields.
@@ -222,11 +162,14 @@ def main (client)
     puts "Enter the CSV filename to be created:"
     filename = gets.chomp
 
+    puts "\nEnter the Jira labels that will be assigned to the issue:"
+    label = gets.chomp
+
     puts "\nEnter the name of the Jira component for the issue to be assigned to:"
     component = gets.chomp
 
     file = create_csv_file_for_jira_import(filename)
-    write_issues_to_csv(file, issues, component)
+    write_issues_to_csv(file, issues, component, label)
     file.close
 
     if File.exists?(filename)

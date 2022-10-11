@@ -28,6 +28,16 @@ After the label has been assigned, when the script is executed, it will filter f
 
 </details>
 
+### Mapping Github IDs to Jira
+
+When extracting the data from Github, the required ID for Jira is not available. To ensure that the right assignees are mapped to the migrated issue, copy the `user.txt.template` file to `user.txt`. Within the `user.txt` file, the user will need to add the Github ID and their Red Hat email that is associated with their Jira account:
+
+```bash
+dislbenn,dbennett@redhat.com
+```
+
+This will allow the script to easily map the Github user to the Jira account within the csv file.
+
 ![Jira Issue Importer](docs/images/import-issues-to-jira.gif)
 
 To execute the script, run the following command:
