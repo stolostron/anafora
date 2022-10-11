@@ -6,7 +6,8 @@ Export issues from Github and format the data into a csv file to be imported int
 
 > Pre-requisites:
 >
-> - You will need a `GITHUB_TOKEN` that provides read access from the [stolostron/backlog](https://github.com/stolostron/backlog) (private) repository (required to fetch issues from the Github repo) label.
+> - You will need a `GITHUB_TOKEN` that provides read access from the [stolostron/backlog](https://github.com/stolostron/backlog) (private) repository (required to fetch issues from the Github repo label).
+> - (Optional) [link](https://app.zenhub.com/settings/tokens) - You will need a `ZENHUB_TOKEN` that provides read access from the [stolostron/backlog](https://github.com/stolostron/backlog) zenhub board (private) repository (required to fetch issue's point estimate from the Github repo).
 > - Ruby - [link](https://mac.install.guide/ruby/13.html) for Homebrew.
 > - Jira - Access to [Jira](issues.redhat.com) is required to import the issue.
 
@@ -21,10 +22,12 @@ After the label has been assigned, when the script is executed, it will filter f
         The following issue types are supported:
     </summary>
 
-1. Bugs
-2. Epics
-3. Tasks
-4. User Stories
+1. Blogs
+2. Bugs
+3. Enhancements
+4. Epics
+5. Tasks
+6. User Stories
 
 </details>
 
