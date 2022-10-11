@@ -1,7 +1,7 @@
 BEGIN {
     require 'colorize'
     require 'octokit'
-    require_relative '../../../config/index'
+    require_relative '../../config/index'
 
     puts "Initializing Anafora Github issues labels replacer.\n".yellow
 

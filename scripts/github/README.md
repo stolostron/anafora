@@ -1,5 +1,7 @@
-# anafora
+# Anafora
+
 Contains scripts for interacting with the Anafora report slack bot (anafora = report)
 
-## github
+## Github
+
 Contains scripts that interact with the github API.

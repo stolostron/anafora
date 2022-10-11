@@ -6,6 +6,8 @@ Contains scripts for interacting with the Anafora report slack bot (anafora = re
 
 To install the gem dependencies within the `Gemfile`, the user will need to run the following command:
 
+![Gem Dependencies](docs/images/gem_graph.png)
+
 ```bash
 bundle install
 ```

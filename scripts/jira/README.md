@@ -1,8 +1,10 @@
-# Jira Issue Importer
+# Jira
+
+## Issue Importer
 
 Export issues from Github and format the data into a csv file to be imported into Jira.
 
-## Running the importer locally
+### Running the importer locally
 
 > Pre-requisites:
 >
@@ -121,6 +123,7 @@ Blocked: false
 Component/s,Issue Type,Summary,Description,Labels,Assignee,Priority,Severity,Blocked,Epic Name
 Observability,story,Enable ACM observability collecting the metrics for service mesh applications,Migrated issue from: https://github.com/stolostron/backlog/issues/18448,Obs-Core,,Normal,,false,,
 ```
+
 </details>
 
 ### Importing CSV to Jira
